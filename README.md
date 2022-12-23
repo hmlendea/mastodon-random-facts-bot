@@ -1,3 +1,11 @@
+# About
+
+This is Python bot that posts a random fact to Mastodon from a predefined list of facts.
+
+The facts are stored in a file and the bot selects a one to post.
+
+It's designed to keep Mastodon users informed and entertained by posting a new fact on a regular basis.
+
 # Usage
 
 ## Running in the background
