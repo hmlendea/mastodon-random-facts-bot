@@ -9,6 +9,7 @@ import random
 from mastodon import Mastodon
 
 import text_replacements
+import dynamic_tags
 
 facts_file_path = sys.argv[1]
 mastodon_instance = sys.argv[2]
@@ -58,7 +59,12 @@ toot_body = text_replacements.apply(random_fact)
 toot_body = toot_body.replace('\\n', '\n')
 
 if tags_to_add:
+    dynamic_tags_to_add = dynamic_tags.get(toot_body)
+
     toot_body += '\n\n' + tags_to_add
+
+    if dynamic_tags_to_add is not None:
+        toot_body += ' ' + dynamic_tags_to_add
 
 print(' > Posting fact:\n' + random_fact)
 mastodon_api.status_post(
