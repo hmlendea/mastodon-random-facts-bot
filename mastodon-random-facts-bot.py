@@ -55,11 +55,12 @@ while random_fact is None:
     random_fact = random.choice(facts)
 
 toot_body = text_replacements.apply(random_fact)
+toot_body = toot_body.replace('\\n', '\n')
 
 if tags_to_add:
     toot_body += '\n\n' + tags_to_add
 
-print('Posting fact: ' + random_fact)
+print(' > Posting fact:\n' + random_fact)
 mastodon_api.status_post(
     toot_body,
     in_reply_to_id = None,
