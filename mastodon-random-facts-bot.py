@@ -91,13 +91,25 @@ toot_body = text_replacements.apply(random_fact)
 toot_body = toot_body.replace('\\n', '\n')
 toot_body = re.sub('\ \ *', ' ', toot_body)
 
-if tags_to_add:
-    dynamic_tags_to_add = dynamic_tags.get(toot_body)
+all_tags_to_add = ''
+dynamic_tags_to_add = dynamic_tags.get(toot_body)
 
-    toot_body += '\n\n' + tags_to_add
+if tags_to_add: all_tags_to_add += ' ' + tags_to_add
+if dynamic_tags_to_add: all_tags_to_add += ' ' + dynamic_tags_to_add
 
-    if dynamic_tags_to_add is not None:
-        toot_body += ' ' + dynamic_tags_to_add
+if all_tags_to_add != '':
+    filtered_tags_to_add = ''
+
+    for tag in all_tags_to_add.split(' '):
+        if '#' not in tag:
+            filtered_tags_to_add += ' ' + tag
+            continue
+
+        if (tag not in toot_body and
+            tag not in filtered_tags_to_add):
+            filtered_tags_to_add += ' ' + tag
+
+    toot_body += '\n\n' + filtered_tags_to_add.strip()
 
 print(' > Posting fact:\n' + random_fact)
 mastodon_api.status_post(
