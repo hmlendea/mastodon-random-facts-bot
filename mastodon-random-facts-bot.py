@@ -105,8 +105,8 @@ if all_tags_to_add != '':
             filtered_tags_to_add += ' ' + tag
             continue
 
-        if (tag.lower() not in toot_body.lower() and
-            tag.lower() not in filtered_tags_to_add.lower()):
+        if (tag.lower() + ' ' not in toot_body.lower() + ' ' and
+            tag.lower() + ' ' not in filtered_tags_to_add.lower() + ' '):
             filtered_tags_to_add += ' ' + tag
 
     toot_body += '\n\n' + filtered_tags_to_add.strip()
