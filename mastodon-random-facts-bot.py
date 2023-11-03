@@ -19,6 +19,7 @@ mastodon_username = sys.argv[3]
 mastodon_email_address = sys.argv[4].lower()
 mastodon_password = base64.b64decode(sys.argv[5]).decode("utf-8")
 tags_to_add = sys.argv[6]
+language = sys.argv[7]
 
 if not os.path.isfile("app_" + mastodon_instance + '.secret'):
     if Mastodon.create_app(
@@ -87,12 +88,12 @@ for media_url in media_urls:
         print('   > FAILURE! ' + str(ex))
 
 random_fact = random_fact.lstrip().rstrip()
-toot_body = text_replacements.apply(random_fact)
+toot_body = text_replacements.apply(random_fact, language)
 toot_body = toot_body.replace('\\n', '\n')
 toot_body = re.sub('\ \ *', ' ', toot_body)
 
 all_tags_to_add = ''
-dynamic_tags_to_add = dynamic_tags.get(toot_body)
+dynamic_tags_to_add = dynamic_tags.get(toot_body, language)
 
 if tags_to_add: all_tags_to_add += ' ' + tags_to_add
 if dynamic_tags_to_add: all_tags_to_add += ' ' + dynamic_tags_to_add
