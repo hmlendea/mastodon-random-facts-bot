@@ -13,6 +13,8 @@ import requests
 import text_replacements
 import dynamic_tags
 
+from fake_useragent import UserAgent
+
 facts_file_path = sys.argv[1]
 mastodon_instance = sys.argv[2]
 mastodon_username = sys.argv[3]
@@ -78,14 +80,15 @@ for media_url in media_urls:
         random_fact = random_fact.replace(media_url, '')
 
         print (' > Uploading media to Mastodon: ' + media_url)
-        media = requests.get(media_url)
+        user_agent = UserAgent().firefox
+        headers = {'User-Agent': user_agent}
+        media = requests.get(media_url, headers=headers)
         media.raise_for_status()
 
         media_posted = mastodon_api.media_post(
             media.content,
             mime_type = media.headers.get('content-type'))
         toot_media.append(media_posted['id'])
-
         print('   > SUCCESS! ' + str(media_posted['id']))
     except Exception as ex:
         print('   > FAILURE! ' + str(ex))
