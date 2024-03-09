@@ -79,13 +79,17 @@ for media_url in media_urls:
 
         print (' > Uploading media to Mastodon: ' + media_url)
         media = requests.get(media_url)
+        media.raise_for_status()
+
         media_posted = mastodon_api.media_post(
             media.content,
             mime_type = media.headers.get('content-type'))
         toot_media.append(media_posted['id'])
+
         print('   > SUCCESS! ' + str(media_posted['id']))
     except Exception as ex:
         print('   > FAILURE! ' + str(ex))
+        raise
 
 random_fact = random_fact.lstrip().rstrip()
 toot_body = text_replacements.apply(random_fact, language)
