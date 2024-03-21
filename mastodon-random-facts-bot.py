@@ -66,6 +66,7 @@ for p in re.finditer(r"https://[a-zA-Z0-9%\./_\-]*", random_fact):
 
     if (media_url.endswith('.gif') or
         media_url.endswith('.jpg') or
+        media_url.endswith('.jpeg') or
         media_url.endswith('.png') or
         media_url.endswith('.webp')):
         print("URL " + media_url)
