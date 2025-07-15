@@ -18,10 +18,9 @@ from fake_useragent import UserAgent
 facts_file_path = sys.argv[1]
 mastodon_instance = sys.argv[2]
 mastodon_username = sys.argv[3]
-mastodon_email_address = sys.argv[4].lower()
-mastodon_password = base64.b64decode(sys.argv[5]).decode("utf-8")
-tags_to_add = sys.argv[6]
-language = sys.argv[7]
+mastodon_access_token = sys.argv[4]
+tags_to_add = sys.argv[5]
+language = sys.argv[6]
 
 if not os.path.isfile("app_" + mastodon_instance + '.secret'):
     if Mastodon.create_app(
@@ -36,17 +35,11 @@ if not os.path.isfile("app_" + mastodon_instance + '.secret'):
 
 try:
     mastodon_api = Mastodon(
-        client_id = "app_" + mastodon_instance + '.secret',
+        access_token = mastodon_access_token,
         api_base_url = 'https://' + mastodon_instance
     )
-    mastodon_api.log_in(
-        mastodon_email_address,
-        password = mastodon_password,
-        scopes = ['read', 'write'],
-        to_file = "app_" + mastodon_username + "@" + mastodon_instance + ".secret"
-    )
-except:
-    print("ERROR: Failed to log " + mastodon_username + " into " + mastodon_instance)
+except Exception as ex:
+    print("ERROR: Failed to log " + mastodon_username + " into " + mastodon_instance + ": " + ex)
     sys.exit(2)
 
 try:
@@ -97,8 +90,8 @@ for media_url in media_urls:
 
 random_fact = random_fact.lstrip().rstrip()
 toot_body = text_replacements.apply(random_fact, language)
-toot_body = toot_body.replace('\\n', '\n')
-toot_body = re.sub('\ \ *', ' ', toot_body)
+toot_body = toot_body.replace(r'\n', '\n')
+toot_body = re.sub(r'\ \ *', ' ', toot_body)
 
 all_tags_to_add = ''
 dynamic_tags_to_add = dynamic_tags.get(toot_body, language)
