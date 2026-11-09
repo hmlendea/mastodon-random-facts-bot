@@ -55,3 +55,33 @@ When doing so, please:
 - Raise a new [issue](https://github.com/hmlendea/mastodon-random-facts-bot/issues) for problems or suggestions
 
 See the [Contributing Guidelines](./CONTRIBUTING.md) for details on how to report issues, suggest enhancements, and submit changes.
+
+## 🛡️ Privacy and Data
+
+Mastodon Random Facts Bot posts a random fact to a Mastodon instance from a predefined list of facts. It handles the Mastodon access token and application secret file locally, and transmits fact content, tags, and media to the configured Mastodon instance.
+
+For the detailed description of how the application handles privacy and personal data, see the [Privacy Statement](./PRIVACY.md).
+
+The application processes the following data categories:
+
+| Data | Purpose | Storage | Retention | Optional |
+|------|---------|---------|-----------|----------|
+| Mastodon instance URL | API endpoint configuration | Command-line argument | Operator-controlled | No |
+| Mastodon username | Application registration | Command-line argument | Operator-controlled | No |
+| Mastodon access token | Authentication with the Mastodon API | Command-line argument | Operator-controlled | No |
+| Tags to add | Hashtags appended to posts | Command-line argument | Operator-controlled | Yes |
+| Language code | Text replacement selection | Command-line argument | Operator-controlled | Yes |
+| Facts file | Source of facts to post | Local file | Operator-controlled | No |
+| Application secret file | Mastodon application credentials | Local file (`app_<instance>.secret`) | Until manually deleted | No |
+| Media URLs in facts | Media upload to Mastodon | Downloaded to memory during upload | Not persisted | Yes |
+
+### Data Locations
+
+| Platform or Scope | Location | Contents |
+|-------------------|----------|----------|
+| Local deployment | Working directory | Application secret file, facts file |
+| Local deployment | Standard output | Operation logs, posted fact content |
+
+### Telemetry Controls
+
+The application does not send telemetry, crash reports, or update checks to the project maintainers or external services beyond the verified Mastodon API integration.
