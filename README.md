@@ -95,3 +95,9 @@ For information on reporting security vulnerabilities, see the [Security Policy]
 ## 📜 Code of Conduct
 
 See the [Code of Conduct](./CODE_OF_CONDUCT.md) for the standards of conduct expected in all project spaces.
+
+## 🏗️ Architecture
+
+Mastodon Random Facts Bot is a single-process, sequential console pipeline that selects a random fact from a local file, transforms its text, downloads and uploads embedded media, and publishes a public Mastodon status.
+
+See the [Architecture Documentation](./ARCHITECTURE.md) for the system context, principal components, runtime flows, ownership boundaries, dependencies, constraints, and extension points.
