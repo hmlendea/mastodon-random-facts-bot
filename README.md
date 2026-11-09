@@ -91,3 +91,7 @@ The application does not send telemetry, crash reports, or update checks to the 
 Mastodon Random Facts Bot handles Mastodon access tokens and application secret files locally. It transmits fact content and media to the configured Mastodon instance.
 
 For information on reporting security vulnerabilities, see the [Security Policy](./SECURITY.md).
+
+## 📜 Code of Conduct
+
+See the [Code of Conduct](./CODE_OF_CONDUCT.md) for the standards of conduct expected in all project spaces.
