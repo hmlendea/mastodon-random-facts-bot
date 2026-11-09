@@ -85,3 +85,9 @@ The application processes the following data categories:
 ### Telemetry Controls
 
 The application does not send telemetry, crash reports, or update checks to the project maintainers or external services beyond the verified Mastodon API integration.
+
+## 🔒 Security
+
+Mastodon Random Facts Bot handles Mastodon access tokens and application secret files locally. It transmits fact content and media to the configured Mastodon instance.
+
+For information on reporting security vulnerabilities, see the [Security Policy](./SECURITY.md).
