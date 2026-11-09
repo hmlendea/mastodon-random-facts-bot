@@ -42,3 +42,16 @@ RuntimeMaxSec=60
 [Install]
 WantedBy=multi-user.target
 ```
+
+## 🤝 Contributing
+
+You are welcome to submit any suggestion, feedback, or modification to this project.
+
+When doing so, please:
+- Maintain cross-platform compatibility
+- Submit focused pull requests that conform to the existing code style
+- Maintain your branch synchronised with `master`
+- Revise the documentation when functionality changes
+- Raise a new [issue](https://github.com/hmlendea/mastodon-random-facts-bot/issues) for problems or suggestions
+
+See the [Contributing Guidelines](./CONTRIBUTING.md) for details on how to report issues, suggest enhancements, and submit changes.
