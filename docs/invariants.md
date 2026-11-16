@@ -32,7 +32,7 @@ The bot writes only the secret file (once) and stdout. It reads the facts file a
 The access token arrives as a command-line argument, lives in process memory, is transmitted to the Mastodon instance over HTTPS, and is never written to disk by the bot.
 
 ### I9: Media bytes never written to disk
-Downloaded media bytes are held in memory (`media.content`) and passed directly to `media_post`. No temporary files are created.
+Downloaded media bytes are held in memory (`media_response.content`) and passed directly to `media_post`. No temporary files are created.
 
 ### I10: Tag block separated by exactly one blank line
 When tags are present, the final body is `body + '\n\n' + tags`. When no tags are present, no trailing blank line is added.
@@ -71,7 +71,7 @@ The regex and suffix filter are heuristics. A URL that passes the filter may not
 
 ## Invariant enforcement
 
-The invariants are enforced by the code structure, not by assertions or tests. The single linear pipeline in `mastodon-random-facts-bot.py` makes I1–I5 and I7–I10 structurally inevitable. I6 is a convention documented in [Operator extension API](./api-reference/operator-extension-api.md).
+The invariants are enforced by the code structure, not by assertions or tests. The single sequential pipeline in `mastodon-random-facts-bot.py` (a `main()` orchestrator over focused single-responsibility functions) makes I1–I5 and I7–I10 structurally inevitable. I6 is a convention documented in [Operator extension API](./api-reference/operator-extension-api.md).
 
 ## Modification checklist
 

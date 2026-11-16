@@ -8,24 +8,25 @@ The bot is a scheduled batch pipeline, not a service. That single fact explains 
 
 The pipeline is strictly sequential. Media downloads and uploads happen one at a time inside a loop. This is a deliberate simplicity trade-off: the bot posts at most one status per invocation, the media set per fact is small, and the documented `systemd` unit bounds each run to 60 seconds. Parallelism would add failure modes (partial upload sets, ordering hazards) without materially improving throughput at this scale.
 
-## Why the decomposition is entry point plus two hooks
+## Why the decomposition is entry point plus configuration and two hooks
 
-The repository separates three concerns that change for different reasons:
+The repository separates four concerns that change for different reasons:
 
 1. **Orchestration and integration** (`mastodon-random-facts-bot.py`) changes when the Mastodon API, the media handling strategy, or the pipeline order changes. It is maintained by the project.
-2. **Text transformation** (`text_replacements.py`) changes when the operator wants locale-specific rewrites. It is maintained by the operator.
-3. **Dynamic tag derivation** (`dynamic_tags.py`) changes when the operator wants content-derived hashtags. It is maintained by the operator.
+2. **Configuration constants** (`config.py`) change when an argument index, exit code, Mastodon parameter, media pattern, or tag separator changes. It is maintained by the project.
+3. **Text transformation** (`text_replacements.py`) changes when the operator wants locale-specific rewrites. It is maintained by the operator.
+4. **Dynamic tag derivation** (`dynamic_tags.py`) changes when the operator wants content-derived hashtags. It is maintained by the operator.
 
 The two hook modules are the operator-facing extension surface. They are imported directly by the entry point; there is no plugin registry, no discovery mechanism, and no configuration file. The contract is the function signature and return type, documented in [Components: text replacements](./components/text-replacements.md) and [Components: dynamic tags](./components/dynamic-tags.md).
 
-This decomposition means an operator can customise posting behaviour without touching orchestration code, and the project can evolve orchestration without breaking operator customisations, provided the hook signatures remain stable.
+This decomposition means an operator can customise posting behaviour without touching orchestration code, and the project can evolve orchestration without breaking operator customisations, provided the hook signatures remain stable. The `config.py` module centralises the named constants (argument indices, exit codes, patterns, and separators) so the orchestration code contains no magic values.
 
 ## Real boundaries
 
 - **Process boundary.** The bot is one operating-system process launched by a scheduler. Everything inside is sequential; everything outside (scheduler, Mastodon instance, media hosts) is asynchronous relative to it.
 - **Trust boundary.** The operator's host and credentials are trusted. Fact file content is trusted operator input. Media URLs embedded in facts are trusted by construction: their bytes are downloaded into memory and forwarded to Mastodon without content validation beyond the response `content-type` header. The Mastodon instance and media hosts are untrusted network peers whose failures terminate the run.
 - **State boundary.** The only persistent local state is the application secret file. The facts file is operator-owned and read-only to the bot. Published statuses and uploaded media become state owned by the Mastodon instance; the bot retains no local record of what it published.
-- **Module boundary.** The helper modules depend only on the Python standard library. They perform no I/O, hold no state, and import nothing from the entry point. This keeps them safe to edit in place and trivial to reason about.
+- **Module boundary.** The `config` module defines constants only, and the helper modules depend only on the Python standard library. They perform no I/O, hold no state, and import nothing from the entry point. This keeps them safe to edit in place and trivial to reason about.
 
 ## Causal model of a posting cycle
 
@@ -57,7 +58,7 @@ Each arrow is a hard dependency. A failure at any stage prevents publication. Th
 ## Consequences for modification
 
 - Adding a new pipeline stage means editing the entry point and deciding where in the causal chain it belongs; stages after media upload but before `status_post` affect the published body.
-- Adding a new media type means editing the suffix condition in the entry point; see [Compatibility contracts](../ARCHITECTURE.md#-compatibility-contracts).
+- Adding a new media type means editing `SUPPORTED_MEDIA_FILE_EXTENSIONS` in `config.py`; see [Compatibility contracts](../ARCHITECTURE.md#-compatibility-contracts).
 - Adding a new configuration input means adding a positional argument, which is a compatibility-breaking change for every existing scheduler invocation; see [Configuration](./configuration.md).
 - Adding a new external integration means adding a new outbound boundary in the entry point; helper modules must remain I/O-free.
 

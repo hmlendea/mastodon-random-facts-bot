@@ -20,7 +20,7 @@ result = Mastodon.create_app(
 ### Client construction
 
 ```python
-mastodon_api = Mastodon(
+mastodon_client = Mastodon(
     access_token='USER_ACCESS_TOKEN',
     api_base_url='https://mastodon.social'
 )
@@ -38,7 +38,7 @@ headers = {'User-Agent': user_agent}
 response = requests.get(media_url, headers=headers)
 response.raise_for_status()
 
-media_posted = mastodon_api.media_post(
+media_posted = mastodon_client.media_post(
     response.content,
     mime_type=response.headers.get('content-type')
 )
@@ -50,12 +50,12 @@ media_id = media_posted['id']
 
 ```python
 toot_body = 'This is the fact text.\n\n #Fact #Random'
-toot_media = ['1234567890', '1234567891']
+media_ids = ['1234567890', '1234567891']
 
-status = mastodon_api.status_post(
+status = mastodon_client.status_post(
     toot_body,
     in_reply_to_id=None,
-    media_ids=toot_media,
+    media_ids=media_ids,
     sensitive=False,
     visibility='public',
     spoiler_text=None
@@ -114,20 +114,20 @@ A successful run with one media URL produces this sequence:
 2. Mastodon('TOKEN', 'https://mastodon.social')
 3. open('facts.txt').readlines() -> ['Fact with https://img.png\n']
 4. random.choice -> 'Fact with https://img.png\n'
-5. re.finditer -> match 'https://img.png' (suffix .png)
-6. random_fact.replace('https://img.png', '') -> 'Fact with \n'
+5. re.finditer(MEDIA_URL_PATTERN, fact) -> match 'https://img.png' (suffix .png)
+6. fact.replace('https://img.png', '') -> 'Fact with \n'
 7. UserAgent().firefox -> 'Mozilla/5.0 ...'
 8. requests.get('https://img.png', headers={'User-Agent': '...'})
 9. response.raise_for_status()
-10. mastodon_api.media_post(response.content, 'image/png') -> {'id': '123'}
-11. text_replacements.apply('Fact with ', 'en') -> 'Fact with '
-12. 'Fact with '.replace(r'\n', '\n') -> 'Fact with '
-13. re.sub(r'\ \ *', ' ', 'Fact with ') -> 'Fact with '
-14. dynamic_tags.get('Fact with ', 'en') -> None
+10. media_post(response.content, 'image/png') -> {'id': '123'}
+11. text_replacements.apply('Fact with', 'en') -> 'Fact with'
+12. 'Fact with'.replace(ESCAPED_NEWLINE_SEQUENCE, NEWLINE_CHARACTER) -> 'Fact with'
+13. re.sub(SPACE_RUN_PATTERN, SINGLE_SPACE, 'Fact with') -> 'Fact with'
+14. dynamic_tags.get('Fact with', 'en') -> None
 15. all_tags_to_add = ' #Fact #Random' (from CLI)
 16. filter -> ' #Fact #Random' (no duplicates in body)
-17. toot_body = 'Fact with \n\n #Fact #Random'
-18. mastodon_api.status_post('Fact with \n\n #Fact #Random', None, ['123'], False, 'public', None)
+17. toot_body = 'Fact with\n\n#Fact #Random'
+18. status_post('Fact with\n\n#Fact #Random', None, ['123'], False, 'public', None)
 ```
 
 ## Error response shapes

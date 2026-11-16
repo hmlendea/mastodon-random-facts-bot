@@ -12,7 +12,7 @@ The module exists so that an operator can customise how fact text is rewritten b
 - Public symbol: `apply(text, language)`.
 - Input: `text` (the stripped fact string), `language` (the sixth command-line argument).
 - Output: the transformed text string.
-- Called from: `mastodon-random-facts-bot.py`, immediately after stripping and before the `\n` escape conversion.
+- Called from: `mastodon-random-facts-bot.py` (`transform_fact_body`), immediately after stripping and before the `\n` escape conversion.
 
 ## Current implementation
 
@@ -59,7 +59,6 @@ The `language` parameter is the designated mechanism for locale-specific behavio
 ## Failure semantics
 
 An exception raised inside `apply` propagates unhandled to the entry point and terminates the process before publication. Because the entry point wraps only the client constructor and the facts read in `try`/`except`, a transformation error produces a traceback, not a friendly message. The invariant that a status is published only when the complete pipeline succeeds is preserved.
-
 ## Modification impact
 
 - Changing the signature breaks the entry point call site.

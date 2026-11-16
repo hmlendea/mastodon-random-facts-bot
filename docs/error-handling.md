@@ -9,7 +9,7 @@ This document catalogues every error path in the bot, its observable behaviour, 
 | **Argument error** | Missing CLI argument | `IndexError` from `sys.argv` | Unhandled traceback | Non-zero |
 | **Registration failure** | `create_app` returns falsy | Explicit check | Print message, `sys.exit(1)` | 1 |
 | **Client construction failure** | `Mastodon(...)` raises | `try`/`except Exception` | Print message, `sys.exit(2)` | 2 |
-| **Facts file unreadable** | `open`/`readlines` raises | Bare `except` | Print message, `sys.exit(1)` | 1 |
+| **Facts file unreadable** | `open`/`readlines` raises | `except Exception` | Print message, `sys.exit(1)` | 1 |
 | **Empty facts file** | `random.choice([])` | `IndexError` | Unhandled traceback | Non-zero |
 | **Media download failure** | `requests.get` raises or `raise_for_status` | `try`/`except` in media loop | Print `FAILURE!`, re-raise | Non-zero (traceback) |
 | **Media upload failure** | `media_post` raises | `try`/`except` in media loop | Print `FAILURE!`, re-raise | Non-zero (traceback) |

@@ -1,0 +1,40 @@
+# Application configuration constants.
+
+# --- Command-line arguments ---
+
+FACTS_FILE_PATH_ARGUMENT_INDEX = 1
+MASTODON_INSTANCE_ARGUMENT_INDEX = 2
+MASTODON_USERNAME_ARGUMENT_INDEX = 3
+MASTODON_ACCESS_TOKEN_ARGUMENT_INDEX = 4
+TAGS_TO_ADD_ARGUMENT_INDEX = 5
+LANGUAGE_ARGUMENT_INDEX = 6
+
+# --- Exit codes ---
+
+APPLICATION_REGISTRATION_FAILURE_EXIT_CODE = 1
+FACTS_FILE_READ_FAILURE_EXIT_CODE = 1
+MASTODON_CLIENT_FAILURE_EXIT_CODE = 2
+
+# --- Mastodon ---
+
+MASTODON_API_BASE_URL_FORMAT = 'https://{instance}'
+APPLICATION_SECRET_FILE_NAME_FORMAT = 'app_{instance}.secret'
+STATUS_VISIBILITY = 'public'
+STATUS_IS_SENSITIVE = False
+
+# --- Media handling ---
+
+MEDIA_URL_PATTERN = r'https://[a-zA-Z0-9%\./_\-]*'
+SUPPORTED_MEDIA_FILE_EXTENSIONS = ('.gif', '.jpg', '.jpeg', '.png', '.webp')
+USER_AGENT_HEADER_NAME = 'User-Agent'
+CONTENT_TYPE_HEADER_NAME = 'content-type'
+
+# --- Text and tag assembly ---
+
+ESCAPED_NEWLINE_SEQUENCE = r'\n'
+NEWLINE_CHARACTER = '\n'
+SPACE_RUN_PATTERN = r'\ \ *'
+SINGLE_SPACE = ' '
+HASHTAG_MARKER = '#'
+TAG_SEPARATOR = ' '
+TAG_BLOCK_SEPARATOR = '\n\n'

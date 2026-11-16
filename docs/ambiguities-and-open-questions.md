@@ -6,33 +6,33 @@ This document records known ambiguities in the codebase, undocumented behaviours
 
 ### A1: `while random_fact is None` loop
 
-**Observation:** The entry point wraps `random.choice(facts)` in `while random_fact is None:`. `random.choice` never returns `None` for a non-empty list, so the loop executes exactly once.
+**Status:** Resolved. The no-op loop was removed during the refactor; `select_random_fact` now returns `random.choice(facts)` directly.
+
+**Observation:** The entry point previously wrapped `random.choice(facts)` in `while random_fact is None:`. `random.choice` never returns `None` for a non-empty list, so the loop executed exactly once.
 
 **Likely intent:** Defensive programming against a hypothetical `None` return, or leftover from an earlier implementation.
 
-**Risk:** Low. The loop is harmless but misleading. A reader may assume `random.choice` can return `None`.
-
-**Resolution options:** Remove the loop; document why it exists; add a comment.
+**Risk:** Low. The loop was harmless but misleading.
 
 ### A2: `base64` and `hashlib` imports
 
-**Observation:** The entry point imports `base64` and `hashlib` but never uses them.
+**Status:** Resolved. The unused imports were removed during the refactor.
+
+**Observation:** The entry point previously imported `base64` and `hashlib` without using them.
 
 **Likely intent:** Placeholders for future features (media hashing, deduplication, content addressing).
 
 **Risk:** Low. Dead imports confuse readers and trigger linter warnings.
 
-**Resolution options:** Remove the imports; implement the intended feature; document the intent.
-
 ### A3: `regex` dependency unused
 
-**Observation:** `requirements.txt` declares `regex`, but no source file imports it. The code uses the standard `re` module.
+**Status:** Resolved. `regex` was removed from `requirements.txt` and `requests` was declared explicitly during the refactor.
+
+**Observation:** `requirements.txt` previously declared `regex`, but no source file imported it. The code uses the standard `re` module.
 
 **Likely intent:** Leftover from an earlier implementation that used the `regex` package for advanced pattern matching.
 
 **Risk:** Low. An unnecessary dependency increases install time and attack surface.
-
-**Resolution options:** Remove from `requirements.txt`; switch to `regex` for the URL extraction; document the intent.
 
 ### A4: Media URL regex character class
 
@@ -168,7 +168,7 @@ This document records known ambiguities in the codebase, undocumented behaviours
 
 **Considerations:**
 - CI without tests provides no value.
-- Adding tests requires extracting testable functions from the linear script.
+- Adding tests is now aided by the single-responsibility functions extracted from the pipeline; see [Testing](./testing.md).
 - The project is small and operator-maintained.
 
 **Status:** Open. See [Testing](./testing.md) for the recommendation.

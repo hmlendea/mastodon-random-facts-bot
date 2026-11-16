@@ -57,7 +57,7 @@ No. The bot only creates original public statuses. `in_reply_to_id` is hardcoded
 Check:
 - The URL starts with `https://` (not `http://`).
 - The URL ends with a supported suffix.
-- The URL contains no query string (`?`) or fragment (`#`); the regex truncates at these characters.
+- The URL contains no query string (`?`) or fragment (`#`); the extraction regex does not recognise these characters.
 - The URL contains only characters from `[a-zA-Z0-9%\./_\-]`.
 
 ### Why does my media URL appear in the published text?

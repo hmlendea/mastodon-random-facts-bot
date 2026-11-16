@@ -11,13 +11,14 @@ The bot uses the `Mastodon` class from the `Mastodon.py` package as its sole Mas
 ### Construction
 
 ```python
-mastodon_api = Mastodon(
+mastodon_client = Mastodon(
     access_token=mastodon_access_token,
-    api_base_url='https://' + mastodon_instance
+    api_base_url=MASTODON_API_BASE_URL_FORMAT.format(instance=mastodon_instance)
 )
 ```
 
-- The instance URL is assembled by string concatenation with a hardcoded `https://` scheme. There is no support for `http://`, custom ports, or path-prefixed instances.
+The `MASTODON_API_BASE_URL_FORMAT` constant in `config.py` formats the instance URL with a hardcoded `https://` scheme. There is no support for `http://`, custom ports, or path-prefixed instances.
+
 - The access token is passed directly from the command line.
 - Construction is wrapped in `try`/`except Exception`; failure exits with code 2.
 
@@ -26,8 +27,8 @@ mastodon_api = Mastodon(
 ```python
 Mastodon.create_app(
     mastodon_username,
-    api_base_url='https://' + mastodon_instance,
-    to_file="app_" + mastodon_instance + '.secret'
+    api_base_url=MASTODON_API_BASE_URL_FORMAT.format(instance=mastodon_instance),
+    to_file=APPLICATION_SECRET_FILE_NAME_FORMAT.format(instance=mastodon_instance)
 )
 ```
 
@@ -38,25 +39,25 @@ Mastodon.create_app(
 ### Media upload
 
 ```python
-media_posted = mastodon_api.media_post(
-    media.content,
-    mime_type=media.headers.get('content-type')
+media_posted = mastodon_client.media_post(
+    media_response.content,
+    mime_type=media_response.headers.get(CONTENT_TYPE_HEADER_NAME)
 )
 ```
 
 - The bytes are the raw download response content.
 - The MIME type is taken from the download response header, not inferred from the URL suffix.
-- The returned dictionary's `id` field is collected into `toot_media`.
+- The returned dictionary's `id` field is collected into the media ID list.
 
 ### Status publication
 
 ```python
-mastodon_api.status_post(
+mastodon_client.status_post(
     toot_body,
     in_reply_to_id=None,
-    media_ids=toot_media,
-    sensitive=False,
-    visibility='public',
+    media_ids=media_ids,
+    sensitive=STATUS_IS_SENSITIVE,
+    visibility=STATUS_VISIBILITY,
     spoiler_text=None
 )
 ```
@@ -80,9 +81,9 @@ The bot uses the `requests` package to download media bytes from URLs embedded i
 
 ```python
 user_agent = UserAgent().firefox
-headers = {'User-Agent': user_agent}
-media = requests.get(media_url, headers=headers)
-media.raise_for_status()
+headers = {USER_AGENT_HEADER_NAME: user_agent}
+media_response = requests.get(media_url, headers=headers)
+media_response.raise_for_status()
 ```
 
 - A fresh `UserAgent` instance is created per media item (see the next section).

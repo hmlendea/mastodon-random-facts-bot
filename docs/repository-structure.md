@@ -1,6 +1,6 @@
 # Repository structure
 
-The repository is deliberately small: one orchestration script, two operator-editable extension modules, a dependency manifest, and documentation. There are no packages, no tests, no CI configuration, and no build system.
+The repository is deliberately small: one orchestration script, a configuration-constants module, two operator-editable extension modules, a dependency manifest, and documentation. There are no packages, no tests, no CI configuration, and no build system.
 
 ## Source tree
 
@@ -22,6 +22,7 @@ mastodon-random-facts-bot/
 ├── PRIVACY.md                      # Privacy and data handling statement
 ├── README.md                       # Project front page
 ├── SECURITY.md                     # Vulnerability reporting and scope
+├── config.py                       # Application configuration constants
 ├── dynamic_tags.py                 # Dynamic tag derivation extension point
 ├── mastodon-random-facts-bot.py    # Entry point and pipeline orchestration
 ├── requirements.txt                # Declared third-party dependencies
@@ -33,6 +34,7 @@ mastodon-random-facts-bot/
 | Path | Role | Imported by |
 |------|------|-------------|
 | `mastodon-random-facts-bot.py` | Entry point; owns all orchestration, network interaction, and pipeline stages | Not imported; executed directly |
+| `config.py` | Configuration and interface constants (CLI argument indices, exit codes, Mastodon parameters, media and tag patterns) | `mastodon-random-facts-bot.py` |
 | `text_replacements.py` | Operator-editable text transformation hook exposing `apply(text, language)` | `mastodon-random-facts-bot.py` |
 | `dynamic_tags.py` | Operator-editable dynamic tag derivation hook exposing `get(text, language)` | `mastodon-random-facts-bot.py` |
 | `requirements.txt` | Declared runtime dependencies | Consumed by `pip` |

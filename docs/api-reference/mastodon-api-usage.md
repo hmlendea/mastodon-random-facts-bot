@@ -13,8 +13,8 @@ The bot uses application-only credentials persisted in `app_<instance>.secret` p
 ```python
 Mastodon.create_app(
     mastodon_username,
-    api_base_url='https://' + mastodon_instance,
-    to_file="app_" + mastodon_instance + '.secret'
+    api_base_url=MASTODON_API_BASE_URL_FORMAT.format(instance=mastodon_instance),
+    to_file=APPLICATION_SECRET_FILE_NAME_FORMAT.format(instance=mastodon_instance)
 )
 ```
 
@@ -32,7 +32,7 @@ Mastodon.create_app(
 ```python
 Mastodon(
     access_token=mastodon_access_token,
-    api_base_url='https://' + mastodon_instance
+    api_base_url=MASTODON_API_BASE_URL_FORMAT.format(instance=mastodon_instance)
 )
 ```
 
@@ -48,9 +48,9 @@ Note: construction does not validate the token. Authentication failures surface 
 ### 3. Media upload
 
 ```python
-media_posted = mastodon_api.media_post(
-    media.content,
-    mime_type=media.headers.get('content-type')
+media_posted = mastodon_client.media_post(
+    media_response.content,
+    mime_type=media_response.headers.get(CONTENT_TYPE_HEADER_NAME)
 )
 ```
 
@@ -59,18 +59,18 @@ media_posted = mastodon_api.media_post(
 | Endpoint | `POST /api/v2/media` (or `/api/v1/media`, depending on `Mastodon.py` version) |
 | Parameters | Raw media bytes, MIME type taken from the download response header |
 | Return | Dictionary containing at least the `id` key |
-| Used value | `media_posted['id']`, appended to `toot_media` |
+| Used value | `media_posted['id']`, appended to the media ID list |
 | Failure handling | Exception propagates through the media loop's re-raise; process terminates |
 
 ### 4. Status publication
 
 ```python
-mastodon_api.status_post(
+mastodon_client.status_post(
     toot_body,
     in_reply_to_id=None,
-    media_ids=toot_media,
-    sensitive=False,
-    visibility='public',
+    media_ids=media_ids,
+    sensitive=STATUS_IS_SENSITIVE,
+    visibility=STATUS_VISIBILITY,
     spoiler_text=None
 )
 ```

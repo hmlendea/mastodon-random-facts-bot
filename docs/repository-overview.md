@@ -9,6 +9,7 @@ Mastodon Random Facts Bot posts a random fact to a Mastodon instance from a pred
 The repository owns:
 
 - The Python entry point that orchestrates the complete posting pipeline.
+- A `config.py` module holding the application's configuration and interface constants.
 - Two operator-editable helper modules that define text replacement and dynamic tag behaviour.
 - The declared dependency manifest.
 - Repository documentation and policy files.
@@ -22,7 +23,7 @@ The repository does not own:
 
 ## Entry points
 
-There is exactly one executable entry point: [mastodon-random-facts-bot.py](../mastodon-random-facts-bot.py). It is a console script, not an importable library. The two helper modules, [text_replacements.py](../text_replacements.py) and [dynamic_tags.py](../dynamic_tags.py), are imported by the entry point and are not independently executable.
+There is exactly one executable entry point: [mastodon-random-facts-bot.py](../mastodon-random-facts-bot.py). It is a console script, not an importable library, and runs its pipeline through a `main()` function guarded by `if __name__ == '__main__':`. The [config.py](../config.py) module holds constants, and the two helper modules, [text_replacements.py](../text_replacements.py) and [dynamic_tags.py](../dynamic_tags.py), are imported by the entry point and are not independently executable.
 
 ## Invocation model
 
@@ -44,6 +45,7 @@ There is no daemon mode, no internal scheduler, no queue, and no retry loop. Per
 - Random selection of one fact per invocation from a local file.
 - Automatic media handling: URLs embedded in facts are downloaded, uploaded to Mastodon, attached to the status, and removed from the published text.
 - Operator-customisable text transformation and dynamic tag derivation through the two helper modules.
+- Centralised configuration constants in `config.py`.
 - Static tag injection through a command-line argument, with deduplication against the fact body.
 - First-run application registration persisted in a local secret file.
 

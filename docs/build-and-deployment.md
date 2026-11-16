@@ -25,7 +25,7 @@ cd mastodon-random-facts-bot
 pip install -r requirements.txt
 ```
 
-This installs `Mastodon.py`, `fake_useragent`, and `regex`. See [Dependencies](./dependencies.md) for the implicit `requests` dependency.
+This installs `Mastodon.py`, `fake_useragent`, and `requests`. See [Dependencies](./dependencies.md) for the dependency roles.
 
 ### 3. Prepare the facts file
 

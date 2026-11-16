@@ -56,7 +56,7 @@ sequenceDiagram
 2. **Secret bootstrap.** The presence of `app_<instance>.secret` is tested with `os.path.isfile`. Absence triggers `Mastodon.create_app`, which registers an application on the instance and writes credentials to the secret file. A falsy return exits with code 1. Presence skips registration entirely; the existing file is reused without verification.
 3. **Client construction.** The `Mastodon` client is constructed with the access token and instance URL. Construction failure exits with code 2. Note that construction does not perform a network round trip in `Mastodon.py`; authentication failures surface later, at the first API call.
 4. **Facts read.** The facts file is read into a list of lines. Read failure exits with code 1. The lines retain their trailing newlines until the selected fact is stripped at stage 8.
-5. **Fact selection.** `random.choice` selects one line. The `while random_fact is None` loop is effectively a no-op because `random.choice` never returns `None` for a non-empty list. An empty facts file raises `IndexError`.
+5. **Fact selection.** `random.choice` selects one line. An empty facts file raises `IndexError`.
 6. **Media extraction.** A regex finds all `https://` URLs in the selected fact. Only URLs whose suffix matches `.gif`, `.jpg`, `.jpeg`, `.png`, or `.webp` are retained. The suffix check is case-sensitive.
 7. **Media handling.** Each retained URL is removed from the fact text, downloaded into memory, and uploaded to Mastodon. The returned media IDs are collected. Any failure aborts the run before publication. See [Flow: media handling](./media-handling.md).
 8. **Text transformation.** The fact is stripped, passed through `text_replacements.apply`, the literal `\n` sequence is converted to a newline, and runs of spaces are collapsed. See [Flow: text transformation and tag assembly](./text-transformation-and-tag-assembly.md).
@@ -66,8 +66,8 @@ sequenceDiagram
 
 ## Alternate paths
 
-- **No media in fact.** The media loop body never executes; `toot_media` remains empty; `status_post` is called with an empty `media_ids` list.
-- **No tags.** When both `tags_to_add` and the dynamic tags result are empty, `all_tags_to_add` remains `''`, the filtering block is skipped, and no tag line is appended.
+- **No media in fact.** The media loop body never executes; the media ID list remains empty; `status_post` is called with an empty `media_ids` list.
+- **No tags.** When both `tags_to_add` and the dynamic tags result are empty, `build_tag_block` returns `None` and no tag line is appended.
 - **Secret file already present.** Registration is skipped; the client is constructed directly.
 - **First run on a new instance.** Registration runs, writes the secret file, and the client is constructed in the same invocation.
 
