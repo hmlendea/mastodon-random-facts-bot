@@ -1,6 +1,6 @@
 # Documentation Index
 
-Last reviewed: 2026-11-16. Owner: repository maintainer (hmlendea). Coverage status: complete for the current single-script pipeline architecture; no test suite or CI workflow exists to document.
+Last reviewed: 2026-11-16. Owner: repository maintainer (hmlendea). Coverage status: complete for the current single-script pipeline architecture; no test suite exists to document.
 
 ## Repository summary
 

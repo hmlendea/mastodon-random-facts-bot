@@ -293,7 +293,7 @@ The bot deploys as a source checkout executed by a local scheduler on the operat
 
 ## ✅ Testing and Verification
 
-The repository contains no test suite, test framework, or CI workflow. Verification is manual: the operator installs dependencies, invokes the bot with a facts file and Mastodon credentials, and confirms that a status with the expected text, tags, and media appears on the target instance. Material coverage gaps include no automated regression protection for the pipeline, no validation of tag filtering or text transformation, and no failure-path testing for media download or API errors.
+The repository contains no test suite, test framework, or application test CI workflow. Verification is manual: the operator installs dependencies, invokes the bot with a facts file and Mastodon credentials, and confirms that a status with the expected text, tags, and media appears on the target instance. The `.github/workflows/security.yml` workflow audits declared dependencies and runs CodeQL, but it executes no application tests. Material coverage gaps include no automated regression protection for the pipeline, no validation of tag filtering or text transformation, and no failure-path testing for media download or API errors.
 
 Execute the principal automated verification with:
 
