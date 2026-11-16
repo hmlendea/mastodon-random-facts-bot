@@ -6,12 +6,12 @@ This document describes how to make common changes to the bot safely. It maps ea
 
 ### Add a supported media suffix
 
-**Files:** `mastodon-random-facts-bot.py` (suffix condition in the media loop).
+**Files:** `config.py` (`SUPPORTED_MEDIA_FILE_EXTENSIONS`) and `mastodon-random-facts-bot.py` (the suffix check in `extract_media_urls`).
 
 **Invariants at risk:** I3 (no media URLs in published body) — a new suffix must be added to both the extraction filter and the removal logic (they share the same condition).
 
 **Steps:**
-1. Add the suffix to the `endswith` condition.
+1. Add the suffix to `SUPPORTED_MEDIA_FILE_EXTENSIONS` in `config.py`.
 2. Test with a fact containing a URL with the new suffix.
 3. Verify the URL is extracted, downloaded, uploaded, and removed from the published text.
 
@@ -33,12 +33,12 @@ This document describes how to make common changes to the bot safely. It maps ea
 
 ### Change the tag filtering logic
 
-**Files:** `mastodon-random-facts-bot.py` (filtering block).
+**Files:** `mastodon-random-facts-bot.py` (the `filter_tags` function).
 
 **Invariants at risk:** I4 (no duplicate hashtags), I10 (tag block separator).
 
 **Steps:**
-1. Modify the filtering block.
+1. Modify the `filter_tags` function.
 2. Write unit tests covering: tag in body, duplicate tags, prefix collisions (`#art` vs `#artificial`), case variants, non-hashtag tokens.
 3. Run the integration test.
 
@@ -46,7 +46,7 @@ This document describes how to make common changes to the bot safely. It maps ea
 
 ### Change the publication parameters
 
-**Files:** `mastodon-random-facts-bot.py` (`status_post` call).
+**Files:** `mastodon-random-facts-bot.py` (the `publish_status` function) and `config.py` (`STATUS_VISIBILITY`, `STATUS_IS_SENSITIVE`).
 
 **Invariants at risk:** I1 (at most one status per invocation) — do not add a second `status_post` call.
 
@@ -59,7 +59,7 @@ This document describes how to make common changes to the bot safely. It maps ea
 
 ### Add a CLI argument
 
-**Files:** `mastodon-random-facts-bot.py` (`sys.argv` binding), all scheduler invocations.
+**Files:** `mastodon-random-facts-bot.py` (`read_arguments` and the argument index constants in `config.py`), all scheduler invocations.
 
 **Invariants at risk:** Compatibility contract (argument order and count). This is a **breaking change**.
 

@@ -34,7 +34,7 @@ All other state is in-memory and dies with the process:
 
 - **Posting history.** The bot does not remember which facts were posted. Deduplication is impossible without external state.
 - **Published status IDs.** The return value of `status_post` is discarded.
-- **Media IDs after publication.** The `toot_media` list is discarded when the process exits.
+- **Media IDs after publication.** The media ID list is discarded when the process exits.
 - **Rate limit state.** The bot does not read rate-limit headers.
 - **Configuration.** All configuration arrives as CLI arguments; nothing is cached.
 

@@ -21,7 +21,7 @@ python mastodon-random-facts-bot.py <facts_file> <instance> <username> <access_t
 
 ## Parsing
 
-- Arguments are read directly from `sys.argv[1]` through `sys.argv[6]`.
+- Arguments are read from `sys.argv[1]` through `sys.argv[6]` by `read_arguments` in the entry point.
 - There is no argument parser, no validation, no default values, and no help output.
 - A missing argument raises `IndexError` with an unhandled traceback.
 - Extra arguments beyond the sixth are silently ignored.

@@ -15,7 +15,7 @@ This guide takes a new contributor from an empty checkout to one verified postin
 python -m pip install -r requirements.txt
 ```
 
-This installs the three declared packages from [requirements.txt](../requirements.txt): `fake_useragent`, `Mastodon.py`, and `regex`. Only `Mastodon.py` and `requests` (a transitive dependency of `Mastodon.py`) are actually imported by the source; see [Dependencies](./dependencies.md).
+This installs the three declared packages from [requirements.txt](../requirements.txt): `fake_useragent`, `Mastodon.py`, and `requests`; see [Dependencies](./dependencies.md).
 
 ## Prepare the facts file
 

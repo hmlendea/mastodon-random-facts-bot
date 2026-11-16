@@ -27,4 +27,4 @@ The entry point `mastodon-random-facts-bot.py` exposes no importable API; it is 
 
 ## Versioning
 
-The bot does not pin dependency versions. `requirements.txt` declares `Mastodon.py`, `fake_useragent`, and `regex` without version constraints. The API shapes documented here reflect the versions current at the time of writing; see [Dependencies](../dependencies.md) for the compatibility posture.
+The bot does not pin dependency versions. `requirements.txt` declares `Mastodon.py`, `fake_useragent`, and `requests` without version constraints. The API shapes documented here reflect the versions current at the time of writing; see [Dependencies](../dependencies.md) for the compatibility posture.

@@ -65,11 +65,12 @@ The principal external boundaries are:
 
 ## 🏗️ Architectural Style
 
-The implementation is a single-process, sequential console batch pipeline with operator-editable extension modules. There is no long-lived service, queue, database, or web layer: the process starts, performs one ordered pass through selection, transformation, media handling, and publication, then exits. The repository demonstrates a procedural script composition style in which the entry point owns orchestration and delegates two well-defined transformation concerns to importable modules.
+The implementation is a single-process, sequential console batch pipeline with operator-editable extension modules. There is no long-lived service, queue, database, or web layer: the process starts, performs one ordered pass through selection, transformation, media handling, and publication, then exits. The repository demonstrates a procedural script composition style in which the entry point owns orchestration, reads named constants from `config.py`, and delegates two well-defined transformation concerns to importable modules.
 
 ```mermaid
 flowchart TD
-    Entry["mastodon-random-facts-bot.py<br/>orchestration and Mastodon integration"] --> Helpers["Operator-Editable Helpers"]
+    Entry["mastodon-random-facts-bot.py<br/>orchestration and Mastodon integration"] --> Config["config.py<br/>configuration constants"]
+    Entry --> Helpers["Operator-Editable Helpers"]
     Helpers --> TR["text_replacements.py<br/>text transformation"]
     Helpers --> DT["dynamic_tags.py<br/>tag derivation"]
     Entry --> MastodonAPI["Mastodon.py client<br/>(Mastodon API)"]
@@ -79,7 +80,8 @@ flowchart TD
 ```
 
 The principal architecture boundaries are:
-- **Entry Point Orchestration:** `mastodon-random-facts-bot.py` owns argument parsing, secret-file bootstrap, API client construction, fact selection, media extraction, tag assembly, and status publication. It may import the two helper modules and the third-party clients, but the helpers must not import it.
+- **Entry Point Orchestration:** `mastodon-random-facts-bot.py` owns argument parsing, secret-file bootstrap, API client construction, fact selection, media extraction, tag assembly, and status publication. It may import `config`, the two helper modules, and the third-party clients, but the helpers and configuration module must not import it.
+- **Configuration Module:** `config.py` owns named interface and pipeline constants. It depends only on the standard library and performs no I/O.
 - **Text Transformation Module:** `text_replacements.py` owns the `apply(text, language)` contract for operator-defined replacements. It depends only on the standard library and receives plain text in, returning plain text out.
 - **Dynamic Tag Module:** `dynamic_tags.py` owns the `get(text, language)` contract for operator-defined tag derivation. It depends only on the standard library and returns a tag string or `None`.
 - **External Client Boundary:** `Mastodon.py` and `requests` are the only network-facing collaborators. All outbound traffic is confined to the entry point; helper modules perform no I/O.
@@ -117,7 +119,8 @@ The principal runtime sequence is:
 
 | Component | Responsibility | Principal Dependencies | Lifetime or Ownership |
 |-----------|----------------|------------------------|-----------------------|
-| `mastodon-random-facts-bot.py` | Entry point and pipeline orchestration: argument handling, secret bootstrap, fact selection, media extraction, download and upload, tag assembly, status publication | `mastodon.Mastodon`, `requests`, `fake_useragent.UserAgent`, `text_replacements`, `dynamic_tags`, standard library | One-shot process owned by the local scheduler; exits after a single post or on failure |
+| `mastodon-random-facts-bot.py` | Entry point and pipeline orchestration: argument handling, secret bootstrap, fact selection, media extraction, download and upload, tag assembly, status publication | `mastodon.Mastodon`, `requests`, `fake_useragent.UserAgent`, `config`, `text_replacements`, `dynamic_tags`, standard library | One-shot process owned by the local scheduler; exits after a single post or on failure |
+| `config.py` | Configuration and interface constants: CLI argument indices, exit codes, Mastodon parameters, media patterns, tag separators | Standard library only | Imported module; no independent lifetime; owned by the repository |
 | `text_replacements.py` | Operator-editable text transformation hook exposed as `apply(text, language)` | Standard library `re` only | Imported module; no independent lifetime; owned by the repository |
 | `dynamic_tags.py` | Operator-editable dynamic tag derivation hook exposed as `get(text, language)` | Standard library `re` only | Imported module; no independent lifetime; owned by the repository |
 | `Mastodon` client (`Mastodon.py`) | Application registration, media upload, and status publication against the Mastodon API | Mastodon instance over HTTPS | Constructed per run inside the entry point; not persisted beyond the process |
@@ -153,7 +156,7 @@ flowchart LR
 | Command-line invocation | Inbound | Six positional arguments: facts file path, instance, username, access token, tags, language | Local scheduler | Missing or malformed arguments raise an unhandled `IndexError`; no argument validation layer exists |
 | `Mastodon.create_app` | Outbound | `mastodon_username`, `api_base_url = https://<instance>`, `to_file = app_<instance>.secret` | Entry point | Returns falsy on failure: logs `Failed to create the application` and exits with code 1 |
 | `Mastodon` client construction | Outbound | `access_token`, `api_base_url` | Entry point | Wrapped in `try`/`except`: logs `ERROR: Failed to log <username> into <instance>` and exits with code 2 |
-| Facts file read | Inbound (local) | `open(facts_file_path, 'r').readlines()` | Entry point | Bare `except`: logs `ERROR: Failed to read the file` and exits with code 1 |
+| Facts file read | Inbound (local) | `open(facts_file_path, 'r').readlines()` | Entry point | `except Exception`: logs `ERROR: Failed to read the file` and exits with code 1 |
 | Media download (`requests.get`) | Outbound | HTTPS GET with `User-Agent` from `fake_useragent` Firefox profile; `raise_for_status()` | Entry point | Exception is logged as `FAILURE!` and re-raised, terminating the process |
 | `media_post` | Outbound | Bytes plus `mime_type` from the download response `content-type` header | Entry point | Same failure path as media download; no retry or fallback |
 | `status_post` | Outbound | Body text, `media_ids`, `sensitive = False`, `visibility = 'public'`, no reply or spoiler | Entry point | Unhandled exception propagates and terminates the process with a traceback |
@@ -175,7 +178,7 @@ sequenceDiagram
     B->>B: filter by .gif/.jpg/.jpeg/.png/.webp suffix
 ```
 
-The bot reads the entire facts file into memory, selects one line uniformly at random, and scans it with a URL regex. Only URLs whose lowercase suffix matches one of the five supported image extensions are retained; other URLs remain in the text. Selection is unconditional: the `while random_fact is None` loop terminates on the first iteration because `random.choice` never returns `None` for a non-empty list, and an empty facts file raises `IndexError`.
+The bot reads the entire facts file into memory, selects one line uniformly at random, and scans it with a URL regex. Only URLs whose lowercase suffix matches one of the five supported image extensions are retained; other URLs remain in the text. Selection is unconditional: `random.choice(facts)` selects exactly one fact, and an empty facts file raises `IndexError`.
 
 ### Media Download and Upload
 
@@ -236,11 +239,12 @@ The pipeline is strictly sequential and single-threaded. Media downloads and upl
 
 ## 🧭 Dependency Direction and Rules
 
-The entry point depends on the two helper modules and on the third-party clients; the helper modules depend only on the Python standard library and must not import the entry point, each other, or any network client. This direction keeps the operator-editable extension points free of orchestration and I/O concerns.
+The entry point depends on the `config` module, the two helper modules, and the third-party clients; the `config` module and the helper modules depend only on the Python standard library and must not import the entry point, each other, or any network client. This direction keeps the configuration constants and the operator-editable extension points free of orchestration and I/O concerns.
 
 ```mermaid
 flowchart LR
-    Entry["mastodon-random-facts-bot.py"] --> TR["text_replacements.py"]
+    Entry["mastodon-random-facts-bot.py"] --> Config["config.py"]
+    Entry --> TR["text_replacements.py"]
     Entry --> DT["dynamic_tags.py"]
     Entry --> Mastodon["Mastodon.py"]
     Entry --> Requests["requests"]
@@ -250,9 +254,10 @@ flowchart LR
 ```
 
 The principal dependency rules are:
-- The entry point may import `text_replacements`, `dynamic_tags`, `mastodon`, `requests`, and `fake_useragent`; it owns all orchestration and network interaction.
+- The entry point may import `config`, `text_replacements`, `dynamic_tags`, `mastodon`, `requests`, and `fake_useragent`; it owns all orchestration and network interaction.
+- `config.py` may define constants only and must import nothing beyond the standard library.
 - `text_replacements.py` and `dynamic_tags.py` may import only the standard library and must expose the stable `apply(text, language)` and `get(text, language)` signatures respectively.
-- Helper modules must not import the entry point, instantiate Mastodon clients, or perform file or network I/O.
+- Helper and configuration modules must not import the entry point, instantiate Mastodon clients, or perform file or network I/O.
 - Third-party packages are consumed only through the entry point; no transitive coupling between `Mastodon.py`, `requests`, and `fake_useragent` is introduced by project code.
 
 ## 📦 External Dependencies
@@ -262,7 +267,6 @@ The principal dependency rules are:
 | `Mastodon.py` | Application registration, media upload, and status publication against the Mastodon API | Entry point constructs the client and calls `create_app`, `media_post`, and `status_post` | The bot's outbound contract is bound to the Mastodon API surface; API changes affect the entry point directly |
 | `requests` | Downloading media bytes from URLs embedded in facts | Entry point calls `requests.get` with a custom user agent header | Media availability depends on arbitrary third-party hosts; failures terminate the run |
 | `fake_useragent` | Supplying a rotating Firefox user agent for media downloads | Entry point instantiates `UserAgent().firefox` per media item | Adds a network-fetching dependency for user agent data; its failure surfaces as a media download failure |
-| `regex` | Declared in `requirements.txt` | Not imported by any project source file | Declared but unused; removal has no architectural effect |
 
 ## 🚀 Deployment and Operations
 
@@ -308,7 +312,6 @@ The first command restores the declared dependencies; the second performs an end
 - **Trusted fact content:** Media URLs and text within facts are treated as trusted operator input; no sanitisation, allow-listing, or content-type verification beyond the response header is performed.
 - **No publication safety net:** Absence of retries, deduplication, or rate-limit handling means transient Mastodon or media-host failures abort the run and defer posting to the next scheduled activation.
 - **Secret exposure surface:** The access token travels as a command-line argument and the application secret persists as a working-directory file; both are operator-managed and outside the bot's control.
-- **Unused declared dependency:** `regex` is declared in `requirements.txt` but imported by no source file, leaving a declared-but-inert dependency.
 
 ## 🔧 Extension Points
 
@@ -333,6 +336,7 @@ The extension must preserve the signature, the `None`-for-empty contract consume
 | Area | Path |
 |------|------|
 | Entry point and pipeline orchestration | `mastodon-random-facts-bot.py` |
+| Configuration and interface constants | `config.py` |
 | Text transformation extension point | `text_replacements.py` |
 | Dynamic tag extension point | `dynamic_tags.py` |
 | Declared runtime dependencies | `requirements.txt` |

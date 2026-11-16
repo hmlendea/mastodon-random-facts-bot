@@ -9,13 +9,10 @@ Media handling begins after fact selection, when the entry point scans the selec
 ## URL extraction
 
 ```python
-for p in re.finditer(r"https://[a-zA-Z0-9%\./_\-]*", random_fact):
-    media_url = p.group(0)
-    if (media_url.endswith('.gif') or
-        media_url.endswith('.jpg') or
-        media_url.endswith('.jpeg') or
-        media_url.endswith('.png') or
-        media_url.endswith('.webp')):
+for url_match in re.finditer(MEDIA_URL_PATTERN, fact):
+    media_url = url_match.group(0)
+
+    if media_url.endswith(SUPPORTED_MEDIA_FILE_EXTENSIONS):
         media_urls.append(media_url)
 ```
 
@@ -40,14 +37,14 @@ sequenceDiagram
     participant MH as Media host
     participant MA as Mastodon API
     loop each extracted URL
-        E->>E: random_fact.replace(url, '')
+        E->>E: fact.replace(url, '')
         E->>E: UserAgent().firefox
         E->>MH: GET url, User-Agent header
         MH-->>E: response (bytes, content-type)
         E->>E: raise_for_status()
         E->>MA: media_post(content, mime_type)
         MA-->>E: media_posted['id']
-        E->>E: toot_media.append(id)
+        E->>E: media_ids.append(id)
     end
 ```
 
@@ -56,11 +53,11 @@ sequenceDiagram
 For each media URL, in list order:
 
 1. The URL is removed from the fact text with `str.replace`. This happens before the download, so a failed download still leaves the URL removed from the in-memory text; however, because any failure aborts the run, the modified text is never published.
-2. A fresh `UserAgent` instance is created and its `.firefox` property is read.
+2. A fresh `UserAgent` instance is created and its `.firefox` property is read (inside `download_and_upload_media_item`).
 3. The URL is fetched with `requests.get` and the Firefox user agent header.
 4. `raise_for_status()` converts HTTP errors to exceptions.
 5. The response bytes and the response `content-type` header are passed to `media_post`.
-6. The returned media ID is appended to `toot_media`.
+6. The returned media ID is appended to the media ID list.
 7. Success is printed (`   > SUCCESS! <id>`).
 
 ### Failure handling
@@ -93,6 +90,6 @@ After the media loop, the fact text no longer contains any supported media URL. 
 
 ## Modification impact
 
-- Adding a supported extension requires editing the suffix condition.
+- Adding a supported extension requires editing `SUPPORTED_MEDIA_FILE_EXTENSIONS` in `config.py`.
 - Changing the regex affects which URLs are recognised; for example, adding `?` to the character class would preserve query strings.
 - Adding retries or timeouts requires wrapping the `requests.get` call; the current design deliberately defers failure to the next scheduled run.

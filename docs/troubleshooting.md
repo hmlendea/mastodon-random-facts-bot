@@ -40,7 +40,7 @@ Check the logs for `URL <url>` lines. If absent, no media URLs were recognised.
 ### Common causes
 
 - Media URL uses `http://` instead of `https://` (regex only matches `https://`).
-- Media URL has a query string (regex truncates at `?`).
+- Media URL has a query string (the extraction regex does not recognise `?`).
 - Media URL has an unsupported extension (only `.gif`, `.jpg`, `.jpeg`, `.png`, `.webp`).
 - Media URL extension is uppercase (`.JPG` not recognised; suffix check is case-sensitive).
 - Media URL contains characters outside `[a-zA-Z0-9%\./_\-]`.

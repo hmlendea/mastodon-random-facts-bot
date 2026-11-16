@@ -15,7 +15,7 @@ The repository contains **no tests**:
 
 The design decisions document records the rationale:
 
-- The bot is a simple linear script with two operator hooks.
+- The bot is a small script with a sequential pipeline and two operator hooks.
 - The core logic is the pipeline order, which is visible by reading the entry point.
 - Testing would require mocking Mastodon, media hosts, and the scheduler.
 - The operator tests by running the bot manually or observing the timeline.
@@ -62,33 +62,30 @@ def test_returns_none():
 
 Run with `pytest` (not a declared dependency; install separately).
 
-### 3. Test the regex extraction
+### 3. Test the media extraction
+
+The extraction logic is the pure `extract_media_urls` function, which can be exercised without a Mastodon client or network access. Because the entry-point filename contains hyphens, load it by path:
 
 ```python
-import re
+import importlib.util
+
+specification = importlib.util.spec_from_file_location('bot', 'mastodon-random-facts-bot.py')
+bot = importlib.util.module_from_spec(specification)
+specification.loader.exec_module(bot)
 
 def test_media_url_extraction():
     fact = 'See https://example.com/img.png and https://example.com/doc.pdf'
-    urls = [m.group(0) for m in re.finditer(r"https://[a-zA-Z0-9%\./_\-]*", fact)]
-    media = [u for u in urls if u.endswith(('.gif', '.jpg', '.jpeg', '.png', '.webp'))]
-    assert media == ['https://example.com/img.png']
+    assert bot.extract_media_urls(fact) == ['https://example.com/img.png']
 ```
 
 ### 4. Test the tag filtering
 
+The filtering logic is the pure `filter_tags` function, likewise testable without network access:
+
 ```python
 def test_tag_filtering():
-    toot_body = 'Fact about art\n\n'
-    all_tags = ' #art #Art #design'
-    filtered = ''
-    for tag in all_tags.split(' '):
-        if '#' not in tag:
-            filtered += ' ' + tag
-            continue
-        if (tag.lower() + ' ' not in toot_body.lower() + ' ' and
-            tag.lower() + ' ' not in filtered.lower() + ' '):
-            filtered += ' ' + tag
-    assert filtered.strip() == '#design'
+    body = 'Fact about art'
+    assert bot.filter_tags(' #art #Art #design', body).strip() == '#design'
 ```
 
 ### 5. Integration test with a real instance
@@ -105,8 +102,8 @@ For changes to the entry point, run the full pipeline against a real instance wi
 | Change type | Minimum test |
 |-------------|--------------|
 | Entry point pipeline order | Full integration run on test instance |
-| Media suffix list | Regex extraction test with new suffix |
-| Tag filtering logic | Unit test with edge cases (prefix tags, case variants) |
+| Media suffix list (`SUPPORTED_MEDIA_FILE_EXTENSIONS`) | `extract_media_urls` test with new suffix |
+| Tag filtering logic (`filter_tags`) | Unit test with edge cases (prefix tags, case variants) |
 | `text_replacements.py` | Unit test of `apply` with sample inputs |
 | `dynamic_tags.py` | Unit test of `get` with sample inputs |
 | Dependency update | Full integration run on test instance |
@@ -124,7 +121,7 @@ For changes to the entry point, run the full pipeline against a real instance wi
 
 If the project grows (more pipeline stages, more hooks, more operators), consider:
 
-1. Extracting the pipeline into testable functions.
+1. Extracting the pipeline's remaining side-effecting stages into testable functions (the pure stages are already extracted).
 2. Adding `pytest` and a `tests/` directory.
 3. Adding a CI workflow that runs unit tests on push.
 4. Adding integration tests against a test instance with a dedicated token.

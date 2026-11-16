@@ -66,7 +66,7 @@ The `None`-for-empty contract is load-bearing: the entry point uses `if dynamic_
 
 ## Interaction with tag filtering
 
-The returned tag string is concatenated with the static `tags_to_add` argument into `all_tags_to_add`. The entry point then splits the concatenation on spaces and filters each token:
+The returned tag string is concatenated with the static `tags_to_add` argument into `all_tags_to_add` inside `build_tag_block`. The entry point then splits the concatenation on spaces and filters each token:
 
 - Tokens without `#` are kept verbatim.
 - Tokens with `#` are kept only when the lowercase tag followed by a space appears in neither the lowercase body plus a trailing space nor the accumulated filtered string plus a trailing space.

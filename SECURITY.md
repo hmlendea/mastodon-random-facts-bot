@@ -32,8 +32,8 @@ To report a vulnerability:
 The original maintainers are not responsible for changes, modifications, or security issues introduced by downstream forks.
 
 The subsequent report categories are in scope for this repository:
-- Vulnerabilities in the application code (mastodon-random-facts-bot.py, dynamic_tags.py, text_replacements.py)
-- Dependency vulnerabilities in declared requirements (fake_useragent, Mastodon.py, regex)
+- Vulnerabilities in the application code (mastodon-random-facts-bot.py, config.py, dynamic_tags.py, text_replacements.py)
+- Dependency vulnerabilities in declared requirements (fake_useragent, Mastodon.py, requests)
 - Secret handling issues (Mastodon access token, application secret file)
 
 The subsequent categories are out of scope unless explicitly stated to the contrary:

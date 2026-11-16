@@ -143,19 +143,18 @@ This document records the significant design decisions that shape the bot, their
 - No debug/trace levels.
 - Adding observability requires a wrapper script.
 
-## 11. Unused imports and dependencies retained
+## 11. Unused imports and dependencies removed
 
-**Decision:** `base64`, `hashlib`, and `regex` remain in the codebase despite being unused.
+**Decision:** The unused `base64` and `hashlib` imports were removed from the entry point, and `regex` was removed from `requirements.txt` in favour of an explicit `requests` declaration.
 
 **Rationale:**
-- They are harmless (no runtime cost beyond import).
-- Removing them is a cosmetic change with no behavioural impact.
-- They may be placeholders for future features (e.g., media hashing, advanced regex).
+- Dead imports and unused declared dependencies add noise to the dependency graph and trigger static analysis warnings.
+- Removing them has no behavioural impact.
+- `requests` is used directly for media downloads and is now declared explicitly rather than relied upon as a transitive dependency of `Mastodon.py`.
 
 **Consequences:**
-- Static analysis tools flag them.
-- They add noise to the dependency graph.
-- A cleanup PR would be accepted but is not a priority.
+- The dependency manifest lists exactly the packages the code imports (`Mastodon.py`, `fake_useragent`, `requests`).
+- Future placeholder features must re-add their imports or dependencies when implemented.
 
 ## 12. No tests in the repository
 

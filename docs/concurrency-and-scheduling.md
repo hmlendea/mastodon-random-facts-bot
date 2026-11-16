@@ -60,7 +60,7 @@ A failure in one run (media download error, publication error, exception) has no
 
 ## Modification impact
 
-- Adding internal concurrency (thread pool for media downloads) would introduce shared state (the `toot_media` list) and require synchronisation.
+- Adding internal concurrency (a thread pool for media downloads) would introduce shared state (the media ID list) and require synchronisation.
 - Adding a lock file would introduce a filesystem dependency and a failure mode (stale lock).
 - Adding a daemon mode would invert the scheduling model and require process supervision.
 

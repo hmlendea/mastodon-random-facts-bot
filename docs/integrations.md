@@ -66,7 +66,7 @@ The bot downloads media bytes from any HTTPS URL embedded in fact text that matc
 ### Operator responsibilities
 
 - Use reliable media hosts in fact files.
-- Prefer URLs without query strings (the regex truncates at `?`).
+- Prefer URLs without query strings (the extraction regex does not recognise `?`).
 - Ensure media hosts allow the bot's user agent.
 
 ## `fake_useragent` upstream

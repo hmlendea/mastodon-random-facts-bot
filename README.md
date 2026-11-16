@@ -45,6 +45,7 @@ A Python console pipeline that selects a random fact from an operator-maintained
 - Random selection of one fact per invocation from a local file.
 - Automatic media handling: URLs embedded in facts are downloaded, uploaded to Mastodon, attached to the status, and removed from the published text.
 - Operator-customisable text transformation and dynamic tag derivation through two helper modules.
+- Centralised configuration constants in `config.py`.
 - Static tag injection through a command-line argument, with deduplication against the fact body.
 - First-run application registration persisted in a local secret file.
 
@@ -75,7 +76,7 @@ On the first run for a given instance, the bot registers an application and writ
 ## ⚠️ Known Limitations
 
 - Media URL suffix matching is case-sensitive; `.JPG` is not recognised.
-- The media extraction regex truncates URLs at `?` or `#`; query strings and fragments are lost.
+- The media extraction regex truncates URLs at `?` or `#`; query strings and fragments are not recognised.
 - No retry or backoff for transient failures (network blips, rate limits, media host downtime); the next scheduled run retries.
 - No fact deduplication across runs; the same fact may be selected on consecutive invocations.
 - The access token is passed as a command-line argument and is visible in the process table and scheduler logs during execution.
@@ -216,6 +217,7 @@ mastodon-random-facts-bot/
 ├── PRIVACY.md                      # Privacy and data handling statement
 ├── README.md                       # Project front page
 ├── SECURITY.md                     # Vulnerability reporting and scope
+├── config.py                       # Application configuration constants
 ├── dynamic_tags.py                 # Dynamic tag derivation extension point
 ├── mastodon-random-facts-bot.py    # Entry point and pipeline orchestration
 ├── requirements.txt                # Declared third-party dependencies
