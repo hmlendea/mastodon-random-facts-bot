@@ -8,7 +8,7 @@ The repository contains **no tests**:
 
 - No test files (`test_*.py`, `*_test.py`, `tests/` directory).
 - No test runner configuration (`pytest.ini`, `tox.ini`, `setup.cfg`).
-- No CI pipeline (`.github/workflows/` contains only `FUNDING.yml`).
+- No test CI pipeline (`.github/workflows/security.yml` runs the security scan only, not tests).
 - No test dependencies in `requirements.txt`.
 
 ## Why no tests
@@ -123,7 +123,7 @@ If the project grows (more pipeline stages, more hooks, more operators), conside
 
 1. Extracting the pipeline's remaining side-effecting stages into testable functions (the pure stages are already extracted).
 2. Adding `pytest` and a `tests/` directory.
-3. Adding a CI workflow that runs unit tests on push.
+3. Adding a CI workflow that runs unit tests on push, complementing the existing security scan workflow.
 4. Adding integration tests against a test instance with a dedicated token.
 
 Until then, manual testing on a test instance is the pragmatic approach.

@@ -1,13 +1,15 @@
 # Repository structure
 
-The repository is deliberately small: one orchestration script, a configuration-constants module, two operator-editable extension modules, a dependency manifest, and documentation. There are no packages, no tests, no CI configuration, and no build system.
+The repository is deliberately small: one orchestration script, a configuration-constants module, two operator-editable extension modules, a dependency manifest, and documentation. There are no packages, no tests, no application test CI configuration, and no build system.
 
 ## Source tree
 
 ```
 mastodon-random-facts-bot/
 ├── .github/
-│   └── FUNDING.yml                 # Funding platform configuration
+│   ├── FUNDING.yml                 # Funding platform configuration
+│   └── workflows/
+│       └── security.yml            # Dependency audit and CodeQL scan
 ├── docs/                           # This documentation set
 │   ├── api-reference/              # Mastodon API usage reference
 │   ├── behaviour/                  # User-facing behaviour documentation
@@ -54,7 +56,7 @@ The [../.gitignore](../.gitignore) file excludes runtime and tooling artefacts f
 The following directories from the conventional documentation layout do not exist and are not required by the current architecture:
 
 - `docs/api-reference/` exists but contains only the Mastodon API usage reference; there are no controllers because the bot exposes no HTTP API of its own.
-- There is no `tests/` directory, no `ci/` directory, and no `.github/workflows/` directory.
+- There is no `tests/` directory, no `ci/` directory, and no application test workflow; `.github/workflows/` contains only the security scan workflow.
 - There is no `examples/` or `samples/` directory.
 
 ## Conventions

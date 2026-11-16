@@ -1,3 +1,4 @@
+[![Security Scan](https://github.com/hmlendea/mastodon-random-facts-bot/actions/workflows/security.yml/badge.svg)](https://github.com/hmlendea/mastodon-random-facts-bot/actions/workflows/security.yml)
 [![Donate](https://img.shields.io/badge/-%E2%99%A5%20Donate-%23ff69b4)](https://hmlendea.go.ro/funding)
 [![Latest Release](https://img.shields.io/github/v/release/hmlendea/mastodon-random-facts-bot)](https://github.com/hmlendea/mastodon-random-facts-bot/releases/latest)
 [![License](https://img.shields.io/github/license/hmlendea/mastodon-random-facts-bot)](https://github.com/hmlendea/mastodon-random-facts-bot/blob/master/LICENSE)
@@ -27,6 +28,7 @@ A Python console pipeline that selects a random fact from an operator-maintained
   - [Setup](#setup)
   - [Run](#run)
   - [Test](#test)
+- [GitHub Actions](#github-actions)
 - [Project Structure](#project-structure)
 - [Architecture](#architecture)
 - [Deployment](#deployment)
@@ -37,6 +39,7 @@ A Python console pipeline that selects a random fact from an operator-maintained
 - [Code of Conduct](#code-of-conduct)
 - [Related Projects](#related-projects)
 - [Security](#security)
+- [Support](#support)
 - [Project Engagement](#project-engagement)
 - [License](#license)
 
@@ -189,7 +192,7 @@ python mastodon-random-facts-bot.py <facts_file> <instance> <username> <access_t
 
 ### Test
 
-The repository contains no automated test suite. Manual testing on a throwaway Mastodon instance is the recommended verification approach:
+The repository contains no automated test suite. The Security Scan workflow audits declared dependencies and runs CodeQL, but it does not execute application tests. Manual testing on a throwaway Mastodon instance is the recommended verification approach:
 
 ```bash
 python mastodon-random-facts-bot.py facts-test.txt test.instance.local testbot TEST_TOKEN " #Test" en
@@ -197,12 +200,20 @@ python mastodon-random-facts-bot.py facts-test.txt test.instance.local testbot T
 
 Verify the status appears on the test instance, media URLs are removed from the published text, tags are appended correctly, and no duplicate hashtags appear.
 
+## ⚙️ GitHub Actions
+
+| Workflow | Purpose | What it does |
+|----------|---------|--------------|
+| [ Security Scan ](https://github.com/hmlendea/mastodon-random-facts-bot/blob/master/.github/workflows/security.yml) | Scan Python dependencies and source code for security issues. | Runs weekly and on changes to `master`; audits `requirements.txt` with `pip-audit` and runs CodeQL for Python. |
+
 ## 🗂️ Project Structure
 
 ```
 mastodon-random-facts-bot/
 ├── .github/
-│   └── FUNDING.yml                 # Funding platform configuration
+│   ├── FUNDING.yml                 # Funding platform configuration
+│   └── workflows/
+│       └── security.yml            # Weekly dependency and CodeQL scanning
 ├── docs/                           # Documentation set
 │   ├── api-reference/              # Mastodon API usage reference
 │   ├── behaviour/                  # User-facing behaviour documentation
@@ -348,6 +359,10 @@ See the [Code of Conduct](./CODE_OF_CONDUCT.md) for the standards of conduct exp
 Mastodon Random Facts Bot handles Mastodon access tokens and application secret files locally. It transmits fact content and media to the configured Mastodon instance.
 
 For information on reporting security vulnerabilities, see the [Security Policy](./SECURITY.md).
+
+## 💬 Support
+
+For support, please [open an issue](https://github.com/hmlendea/mastodon-random-facts-bot/issues).
 
 ## 🔗 Related Projects
 

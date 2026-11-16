@@ -158,7 +158,7 @@ This document records the significant design decisions that shape the bot, their
 
 ## 12. No tests in the repository
 
-**Decision:** The repository contains no test files, no test runner configuration, and no CI pipeline.
+**Decision:** The repository contains no test files, no test runner configuration, and no test CI pipeline; the only workflow is the security scan.
 
 **Rationale:**
 - The bot is a simple script with two operator hooks; the core logic is the pipeline order.

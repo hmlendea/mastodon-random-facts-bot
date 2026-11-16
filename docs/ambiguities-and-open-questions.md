@@ -164,7 +164,7 @@ This document records known ambiguities in the codebase, undocumented behaviours
 
 ### Q6: Should the repository add CI?
 
-**Context:** No CI pipeline exists. No tests exist.
+**Context:** No test CI pipeline exists. No tests exist. A security scan workflow audits dependencies and runs CodeQL, but it provides no test coverage.
 
 **Considerations:**
 - CI without tests provides no value.
